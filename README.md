@@ -9,3 +9,8 @@ Issue #1 - Gestión de Eventos
 
 Funcionalidad para registrar, consultar y administrar eventos.
 
+## Issue #2 - Gestión de Boletas
+
+Funcionalidad para registrar y administrar boletas.
+
+
