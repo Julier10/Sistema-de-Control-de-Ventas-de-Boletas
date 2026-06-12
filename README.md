@@ -17,5 +17,8 @@ Funcionalidad para registrar y administrar boletas.
 
 Funcionalidad para registrar y administrar clientes.
 
+## Issue #4 - Registro de Ventas
+
+Funcionalidad para registrar ventas de boletas.
 
 
