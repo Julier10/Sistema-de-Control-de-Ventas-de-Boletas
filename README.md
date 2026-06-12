@@ -13,4 +13,9 @@ Funcionalidad para registrar, consultar y administrar eventos.
 
 Funcionalidad para registrar y administrar boletas.
 
+## Issue #3 - Gestión de Clientes
+
+Funcionalidad para registrar y administrar clientes.
+
+
 
