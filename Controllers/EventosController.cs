@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using SistemaVentaBoletas.Domain.Entities;
-using SistemaVentaBoletas.Infrastructure.Interfaces;
-using SistemaVentaBoletasAPI.DTOs;
+using SistemaVentaBoletas.Application.Contract;
+using SistemaVentaBoletas.Application.Dtos;
 
 namespace SistemaVentaBoletasAPI.Controllers
 {
@@ -10,24 +9,24 @@ namespace SistemaVentaBoletasAPI.Controllers
     [ApiController]
     public class EventosController : ControllerBase
     {
-        private readonly IEventoRepository _eventoRepository;
+        private readonly IEventoService _eventoService;
 
-        public EventosController(IEventoRepository eventoRepository)
+        public EventosController(IEventoService eventoService)
         {
-            _eventoRepository = eventoRepository;
+            _eventoService = eventoService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var eventos = await _eventoRepository.GetAllAsync();
+            var eventos = await _eventoService.GetAllAsync();
             return Ok(eventos);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var evento = await _eventoRepository.GetByIdAsync(id);
+            var evento = await _eventoService.GetByIdAsync(id);
 
             if (evento == null)
                 return NotFound();
@@ -36,48 +35,34 @@ namespace SistemaVentaBoletasAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(EventoDTO dto)
+        public async Task<IActionResult> Post(EventoDto dto)
         {
-            Evento evento = new Evento()
-            {
-                Nombre = dto.Nombre,
-                Fecha = dto.Fecha,
-                Lugar = dto.Lugar,
-                Precio = dto.Precio,
-                CuposDisponibles = dto.CuposDisponibles
-            };
+            var resultado = await _eventoService.CreateAsync(dto);
 
-            var creado = await _eventoRepository.AddAsync(evento);
+            if (!resultado.Success)
+                return BadRequest(resultado.Errors);
 
-            return Ok(creado);
+            return Ok(resultado.Data);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, EventoDTO dto)
+        public async Task<IActionResult> Put(int id, EventoDto dto)
         {
-            var evento = await _eventoRepository.GetByIdAsync(id);
+            var resultado = await _eventoService.UpdateAsync(id, dto);
 
-            if (evento == null)
-                return NotFound();
+            if (!resultado.Success)
+                return BadRequest(resultado.Errors);
 
-            evento.Nombre = dto.Nombre;
-            evento.Fecha = dto.Fecha;
-            evento.Lugar = dto.Lugar;
-            evento.Precio = dto.Precio;
-            evento.CuposDisponibles = dto.CuposDisponibles;
-
-            var actualizado = await _eventoRepository.UpdateAsync(evento);
-
-            return Ok(actualizado);
+            return Ok(resultado.Data);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var eliminado = await _eventoRepository.DeleteAsync(id);
+            var resultado = await _eventoService.DeleteAsync(id);
 
-            if (!eliminado)
-                return NotFound();
+            if (!resultado.Success)
+                return NotFound(resultado.Errors);
 
             return Ok();
         }

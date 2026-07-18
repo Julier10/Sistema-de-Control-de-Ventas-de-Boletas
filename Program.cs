@@ -1,3 +1,5 @@
+using SistemaVentaBoletas.Application.Contract;
+using SistemaVentaBoletas.Application.Service;
 using SistemaVentaBoletas.Infrastructure.Interfaces;
 using SistemaVentaBoletas.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +23,10 @@ builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 builder.Services.AddScoped<IEventoRepository, EventoRepository>();
 builder.Services.AddScoped<IBoletaRepository, BoletaRepository>();
 builder.Services.AddScoped<IVentaRepository, VentaRepository>();
+builder.Services.AddScoped<IClienteService, ClienteService>();
+builder.Services.AddScoped<IEventoService, EventoService>();
+builder.Services.AddScoped<IBoletaService, BoletaService>();
+builder.Services.AddScoped<IVentaService, VentaService>();
 
 
 var app = builder.Build();

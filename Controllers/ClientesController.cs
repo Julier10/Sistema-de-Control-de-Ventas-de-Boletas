@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using SistemaVentaBoletas.Domain.Entities;
-using SistemaVentaBoletas.Infrastructure.Interfaces;
-using SistemaVentaBoletasAPI.DTOs;
+using SistemaVentaBoletas.Application.Contract;
+using SistemaVentaBoletas.Application.Dtos;
 
 namespace SistemaVentaBoletasAPI.Controllers
 {
@@ -10,24 +9,24 @@ namespace SistemaVentaBoletasAPI.Controllers
     [ApiController]
     public class ClientesController : ControllerBase
     {
-        private readonly IClienteRepository _clienteRepository;
+        private readonly IClienteService _clienteService;
 
-        public ClientesController(IClienteRepository clienteRepository)
+        public ClientesController(IClienteService clienteService)
         {
-            _clienteRepository = clienteRepository;
+            _clienteService = clienteService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var clientes = await _clienteRepository.GetAllAsync();
+            var clientes = await _clienteService.GetAllAsync();
             return Ok(clientes);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var cliente = await _clienteRepository.GetByIdAsync(id);
+            var cliente = await _clienteService.GetByIdAsync(id);
 
             if (cliente == null)
                 return NotFound();
@@ -36,46 +35,34 @@ namespace SistemaVentaBoletasAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(ClienteDTO dto)
+        public async Task<IActionResult> Post(ClienteDto dto)
         {
-            Cliente cliente = new Cliente()
-            {
-                Nombre = dto.Nombre,
-                Apellido = dto.Apellido,
-                Email = dto.Email,
-                Telefono = dto.Telefono
-            };
+            var resultado = await _clienteService.CreateAsync(dto);
 
-            var creado = await _clienteRepository.AddAsync(cliente);
+            if (!resultado.Success)
+                return BadRequest(resultado.Errors);
 
-            return Ok(creado);
+            return Ok(resultado.Data);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, ClienteDTO dto)
+        public async Task<IActionResult> Put(int id, ClienteDto dto)
         {
-            var cliente = await _clienteRepository.GetByIdAsync(id);
+            var resultado = await _clienteService.UpdateAsync(id, dto);
 
-            if (cliente == null)
-                return NotFound();
+            if (!resultado.Success)
+                return BadRequest(resultado.Errors);
 
-            cliente.Nombre = dto.Nombre;
-            cliente.Apellido = dto.Apellido;
-            cliente.Email = dto.Email;
-            cliente.Telefono = dto.Telefono;
-
-            var actualizado = await _clienteRepository.UpdateAsync(cliente);
-
-            return Ok(actualizado);
+            return Ok(resultado.Data);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var eliminado = await _clienteRepository.DeleteAsync(id);
+            var resultado = await _clienteService.DeleteAsync(id);
 
-            if (!eliminado)
-                return NotFound();
+            if (!resultado.Success)
+                return NotFound(resultado.Errors);
 
             return Ok();
         }

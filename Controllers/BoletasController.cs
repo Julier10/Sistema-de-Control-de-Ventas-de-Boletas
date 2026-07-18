@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using SistemaVentaBoletas.Domain.Entities;
-using SistemaVentaBoletas.Infrastructure.Interfaces;
-using SistemaVentaBoletasAPI.DTOs;
+using SistemaVentaBoletas.Application.Contract;
+using SistemaVentaBoletas.Application.Dtos;
 
 namespace SistemaVentaBoletasAPI.Controllers
 {
@@ -10,24 +9,24 @@ namespace SistemaVentaBoletasAPI.Controllers
     [ApiController]
     public class BoletasController : ControllerBase
     {
-        private readonly IBoletaRepository _boletaRepository;
+        private readonly IBoletaService _boletaService;
 
-        public BoletasController(IBoletaRepository boletaRepository)
+        public BoletasController(IBoletaService boletaService)
         {
-            _boletaRepository = boletaRepository;
+            _boletaService = boletaService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var boletas = await _boletaRepository.GetAllAsync();
+            var boletas = await _boletaService.GetAllAsync();
             return Ok(boletas);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var boleta = await _boletaRepository.GetByIdAsync(id);
+            var boleta = await _boletaService.GetByIdAsync(id);
 
             if (boleta == null)
                 return NotFound();
@@ -36,44 +35,34 @@ namespace SistemaVentaBoletasAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(BoletaDTO dto)
+        public async Task<IActionResult> Post(BoletaDto dto)
         {
-            Boleta boleta = new Boleta()
-            {
-                Codigo = dto.Codigo,
-                Estado = dto.Estado,
-                EventoId = dto.EventoId
-            };
+            var resultado = await _boletaService.CreateAsync(dto);
 
-            var creada = await _boletaRepository.AddAsync(boleta);
+            if (!resultado.Success)
+                return BadRequest(resultado.Errors);
 
-            return Ok(creada);
+            return Ok(resultado.Data);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, BoletaDTO dto)
+        public async Task<IActionResult> Put(int id, BoletaDto dto)
         {
-            var boleta = await _boletaRepository.GetByIdAsync(id);
+            var resultado = await _boletaService.UpdateAsync(id, dto);
 
-            if (boleta == null)
-                return NotFound();
+            if (!resultado.Success)
+                return BadRequest(resultado.Errors);
 
-            boleta.Codigo = dto.Codigo;
-            boleta.Estado = dto.Estado;
-            boleta.EventoId = dto.EventoId;
-
-            var actualizada = await _boletaRepository.UpdateAsync(boleta);
-
-            return Ok(actualizada);
+            return Ok(resultado.Data);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var eliminada = await _boletaRepository.DeleteAsync(id);
+            var resultado = await _boletaService.DeleteAsync(id);
 
-            if (!eliminada)
-                return NotFound();
+            if (!resultado.Success)
+                return NotFound(resultado.Errors);
 
             return Ok();
         }

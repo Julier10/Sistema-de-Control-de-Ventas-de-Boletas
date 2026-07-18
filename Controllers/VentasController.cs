@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using SistemaVentaBoletas.Domain.Entities;
-using SistemaVentaBoletas.Infrastructure.Interfaces;
-using SistemaVentaBoletasAPI.DTOs;
+using SistemaVentaBoletas.Application.Contract;
+using SistemaVentaBoletas.Application.Dtos;
 
 namespace SistemaVentaBoletasAPI.Controllers
 {
@@ -10,24 +9,24 @@ namespace SistemaVentaBoletasAPI.Controllers
     [ApiController]
     public class VentasController : ControllerBase
     {
-        private readonly IVentaRepository _ventaRepository;
+        private readonly IVentaService _ventaService;
 
-        public VentasController(IVentaRepository ventaRepository)
+        public VentasController(IVentaService ventaService)
         {
-            _ventaRepository = ventaRepository;
+            _ventaService = ventaService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var ventas = await _ventaRepository.GetAllAsync();
+            var ventas = await _ventaService.GetAllAsync();
             return Ok(ventas);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var venta = await _ventaRepository.GetByIdAsync(id);
+            var venta = await _ventaService.GetByIdAsync(id);
 
             if (venta == null)
                 return NotFound();
@@ -36,48 +35,34 @@ namespace SistemaVentaBoletasAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(VentaDTO dto)
+        public async Task<IActionResult> Post(VentaDto dto)
         {
-            Venta venta = new Venta()
-            {
-                FechaVenta = dto.FechaVenta,
-                CantidadBoletas = dto.CantidadBoletas,
-                Total = dto.Total,
-                EventoId = dto.EventoId,
-                ClienteId = dto.ClienteId
-            };
+            var resultado = await _ventaService.CreateAsync(dto);
 
-            var creada = await _ventaRepository.AddAsync(venta);
+            if (!resultado.Success)
+                return BadRequest(resultado.Errors);
 
-            return Ok(creada);
+            return Ok(resultado.Data);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, VentaDTO dto)
+        public async Task<IActionResult> Put(int id, VentaDto dto)
         {
-            var venta = await _ventaRepository.GetByIdAsync(id);
+            var resultado = await _ventaService.UpdateAsync(id, dto);
 
-            if (venta == null)
-                return NotFound();
+            if (!resultado.Success)
+                return BadRequest(resultado.Errors);
 
-            venta.FechaVenta = dto.FechaVenta;
-            venta.CantidadBoletas = dto.CantidadBoletas;
-            venta.Total = dto.Total;
-            venta.EventoId = dto.EventoId;
-            venta.ClienteId = dto.ClienteId;
-
-            var actualizada = await _ventaRepository.UpdateAsync(venta);
-
-            return Ok(actualizada);
+            return Ok(resultado.Data);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var eliminada = await _ventaRepository.DeleteAsync(id);
+            var resultado = await _ventaService.DeleteAsync(id);
 
-            if (!eliminada)
-                return NotFound();
+            if (!resultado.Success)
+                return NotFound(resultado.Errors);
 
             return Ok();
         }
