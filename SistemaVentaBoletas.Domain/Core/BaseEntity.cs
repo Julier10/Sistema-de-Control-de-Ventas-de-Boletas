@@ -1,0 +1,12 @@
+﻿using System;
+
+namespace SistemaVentaBoletas.Domain.Core
+{
+    public abstract class BaseEntity
+    {
+        public int Id { get; set; }
+        public DateTime FechaCreacion { get; set; } = DateTime.Now;
+        public DateTime? FechaModificacion { get; set; }
+        public bool Activo { get; set; } = true;
+    }
+}

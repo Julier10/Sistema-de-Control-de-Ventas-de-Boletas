@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="../SistemaVentaBoletas.Domain/SistemaVentaBoletas.Domain.csproj" Id="20cbb97b-bada-4af1-b9eb-bc68a61b62d7" />
+  <Project Path="../SistemaVentaBoletas.Infrastructure/SistemaVentaBoletas.Infrastructure.csproj" Id="2204a06c-42a3-41ad-9411-b200673d201e" />
+  <Project Path="SistemaVentaBoletasAPI.csproj" />
+</Solution>
