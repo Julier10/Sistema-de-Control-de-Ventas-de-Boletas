@@ -1,10 +1,10 @@
 # TicketPro RD — Frontend de Control de Ventas de Boletas
 
 Frontend en HTML/CSS/JS puro (sin frameworks, sin build step) hecho a medida
-para consumir el backend `SistemaVentaBoletasAPI` del repositorio subido.
+para consumir el backend SistemaVentaBoletasAPI del repositorio subido.
 Cubre los 4 recursos expuestos por la API: **Eventos, Boletas, Clientes y Ventas**,
 con listado, creación, edición y eliminación para cada uno, más un panel de
-resumen (Dashboard).
+resumen.
 
 ## Estructura
 
@@ -19,11 +19,11 @@ frontend/
 
 ## 1. Habilitar CORS en el backend
 
-El `Program.cs` del repo no tiene CORS configurado, así que el navegador
+El Program.cs del repo no tiene CORS configurado, así que el navegador
 bloqueará las peticiones del frontend hasta que lo agregues. Añade esto en
-`Program.cs`, **antes** de `builder.Build()`:
+Program.cs, antes de builder.Build() :
 
-```csharp
+csharp
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
@@ -38,7 +38,7 @@ builder.Services.AddCors(options =>
 });
 ```
 
-Y esto **después** de `var app = builder.Build();`, antes de `app.MapControllers();`:
+Y esto después de {var app = builder.Build();`, antes de `app.MapControllers();`:
 
 ```csharp
 app.UseCors("FrontendPolicy");
@@ -46,8 +46,8 @@ app.UseCors("FrontendPolicy");
 
 ## 2. Apuntar el frontend a tu API
 
-Edita `js/config.js` con la URL real donde corre tu API (revisa
-`Properties/launchSettings.json` del backend si no la sabes):
+Edita js/config.js con la URL real donde corre tu API (revisa
+Properties/launchSettings.json del backend si no la sabes):
 
 ```js
 window.TICKETPRO_API_URL = 'https://localhost:51653/api';
@@ -63,7 +63,7 @@ npx http-server -p 5500
 # o: python -m http.server 5500
 ```
 
-Abre `http://localhost:5500`. Si la API no responde, verás un aviso en el
+Abre http://localhost:5500. Si la API no responde, verás un aviso en el
 panel indicando que no hay conexión (revisa CORS y que el backend esté
 corriendo).
 
